@@ -172,7 +172,7 @@ void
 system_Configure(libvlc_int_t *p_libvlc, int i_argc, const char *const pp_argv[])
 {
     (void)i_argc; (void)pp_argv;
-    assert(s_jvm != NULL);
+    //assert(s_jvm != NULL);
     var_Create(p_libvlc, "android-jvm", VLC_VAR_ADDRESS);
     var_SetAddress(p_libvlc, "android-jvm", s_jvm);
 }
