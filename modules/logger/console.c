@@ -169,7 +169,7 @@ vlc_module_begin()
     set_description(N_("Console logger"))
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
-    set_capability("logger", 10)
+    set_capability("logger", 40)
     set_callback(Open)
 
     add_bool("quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false)
