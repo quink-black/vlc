@@ -179,6 +179,7 @@ struct syms
 {
     struct {
         pf_AMediaCodec_createCodecByName createCodecByName;
+        pf_AMediaCodec_createCodecByName createCodecByType;
         pf_AMediaCodec_configure configure;
         pf_AMediaCodec_start start;
         pf_AMediaCodec_stop stop;
@@ -214,6 +215,7 @@ static struct members members[] =
 {
 #define OFF(x) offsetof(struct syms, AMediaCodec.x)
     { "AMediaCodec_createCodecByName", OFF(createCodecByName), true },
+    { "AMediaCodec_createDecoderByType", OFF(createCodecByType), true },
     { "AMediaCodec_configure", OFF(configure), true },
     { "AMediaCodec_start", OFF(start), true },
     { "AMediaCodec_stop", OFF(stop), true },
@@ -300,9 +302,12 @@ static int ConfigureDecoder(mc_api *api, union mc_api_args *p_args)
     mc_api_sys *p_sys = api->p_sys;
     ANativeWindow *p_anw = NULL;
 
-    assert(api->psz_mime && api->psz_name);
+    assert(api->psz_mime || api->psz_name);
 
-    p_sys->p_codec = syms.AMediaCodec.createCodecByName(api->psz_name);
+    if (api->psz_name)
+        p_sys->p_codec = syms.AMediaCodec.createCodecByName(api->psz_name);
+    else
+        p_sys->p_codec = syms.AMediaCodec.createCodecByType(api->psz_mime);
     if (!p_sys->p_codec)
     {
         msg_Err(api->p_obj, "AMediaCodec.createCodecByName for %s failed",
@@ -636,8 +641,9 @@ static int Prepare(mc_api * api, int i_profile)
     api->i_quirks = 0;
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
                                        i_profile, &api->i_quirks);
-    if (!api->psz_name)
-        return MC_API_ERROR;
+    if (!api->psz_name) {
+        return 0;
+    }
     api->i_quirks |= OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
                                         strlen(api->psz_name));
     /* Allow interlaced picture after API 21 */
