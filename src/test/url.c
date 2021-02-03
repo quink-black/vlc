@@ -224,14 +224,17 @@ int main (void)
     assert (fd != -1);*/
 
 #ifndef _WIN32 /* FIXME: deal with anti-slashes */
-    if (chdir ("/tmp"))
+    const char *tmpdir = getenv("TMPDIR");
+    if (tmpdir == NULL)
+        tmpdir = "/tmp";
+    if (chdir (tmpdir))
     {
-        perror("/tmp");
+        perror(tmpdir);
         exit(1);
     }
 
-    char buf[256];
-    char *tmpdir = getcwd(buf, ARRAY_SIZE (buf));
+    char buf[512];
+    tmpdir = getcwd(buf, ARRAY_SIZE (buf));
     if (tmpdir == NULL)
     {
         perror("getcwd");
