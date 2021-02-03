@@ -34,10 +34,6 @@
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-#ifndef SOCK_CLOEXEC
-# define SOCK_CLOEXEC 0
-# define accept4(a,b,c,d) accept(a,b,c)
-#endif
 #ifdef _WIN32
 # include <winsock2.h>
 #else
@@ -48,6 +44,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_interrupt.h>
 #include <vlc_tls.h>
 #include "transport.h"
 
@@ -102,9 +99,12 @@ static void *proxy_thread(void *data)
 
     for (;;)
     {
-        int cfd = accept4(*lfd, NULL, NULL, SOCK_CLOEXEC);
+        int cfd = vlc_accept_i11e(*lfd, NULL, NULL, false);
         if (cfd == -1)
+        {
+            vlc_testcancel();
             continue;
+        }
 
         int canc = vlc_savecancel();
         proxy_client_process(cfd);
