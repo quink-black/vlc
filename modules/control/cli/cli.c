@@ -325,7 +325,10 @@ error:      wordfree(&we);
         arg += strspn(arg, " ");
 
         if (*arg)
+        {
+            args[1] = arg;
             count++;
+        }
     }
 #endif
 
