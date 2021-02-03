@@ -576,7 +576,6 @@ check_PROGRAMS = \
 	test_dictionary \
 	test_executor \
 	test_i18n_atof \
-	test_interrupt \
 	test_list \
 	test_md5 \
 	test_picture_pool \
@@ -593,8 +592,13 @@ check_PROGRAMS = \
 	test_playlist \
 	test_randomizer \
 	test_media_source \
-	test_extensions \
+	test_extensions
+
+if !HAVE_ANDROID
+check_PROGRAMS += \
+	test_interrupt \
 	test_thread
+endif
 
 TESTS = $(check_PROGRAMS) check_symbols
 
