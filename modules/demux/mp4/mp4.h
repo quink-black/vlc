@@ -49,10 +49,12 @@ typedef struct
     uint32_t     i_entries_dts;
     uint32_t     *p_sample_count_dts;
     uint32_t     *p_sample_delta_dts;   /* dts delta */
+    uint32_t     *p_sample_dts_info;
 
     uint32_t     i_entries_pts;
     uint32_t     *p_sample_count_pts;
     uint32_t     *p_sample_offset_pts;  /* pts-dts */
+    uint32_t     *p_sample_pts_info;
 
     /* TODO if needed add pts
         but quickly *add* support for edts and seeking */

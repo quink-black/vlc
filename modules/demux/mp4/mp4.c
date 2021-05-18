@@ -2401,9 +2401,11 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
         ck->i_entries_dts = 0;
         ck->p_sample_count_dts = NULL;
         ck->p_sample_delta_dts = NULL;
+        ck->p_sample_dts_info = NULL;
         ck->i_entries_pts = 0;
         ck->p_sample_count_pts = NULL;
         ck->p_sample_offset_pts = NULL;
+        ck->p_sample_pts_info = NULL;
     }
 
     /* now we read index for SampleEntry( soun vide mp4a mp4v ...)
@@ -2624,16 +2626,15 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 return i_ret;
 
             /* allocate them */
-            ck->p_sample_count_dts = calloc( ck->i_entries_dts, sizeof( uint32_t ) );
-            ck->p_sample_delta_dts = calloc( ck->i_entries_dts, sizeof( uint32_t ) );
-            if( !ck->p_sample_count_dts || !ck->p_sample_delta_dts )
+            ck->p_sample_dts_info = calloc( ck->i_entries_dts * 2, sizeof( uint32_t ) );
+            if( ck->p_sample_dts_info == NULL )
             {
-                free( ck->p_sample_count_dts );
-                free( ck->p_sample_delta_dts );
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_dts );
                 ck->i_entries_dts = 0;
                 return VLC_ENOMEM;
             }
+            ck->p_sample_count_dts = ck->p_sample_dts_info;
+            ck->p_sample_delta_dts = ck->p_sample_dts_info + ck->i_entries_dts;
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
@@ -2739,16 +2740,15 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 return i_ret;
 
             /* allocate them */
-            ck->p_sample_count_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
-            ck->p_sample_offset_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
-            if( !ck->p_sample_count_pts || !ck->p_sample_offset_pts )
+            ck->p_sample_pts_info = calloc( ck->i_entries_pts * 2, sizeof( uint32_t ) );
+            if( ck->p_sample_pts_info == NULL )
             {
-                free( ck->p_sample_count_pts );
-                free( ck->p_sample_offset_pts );
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_pts );
                 ck->i_entries_pts = 0;
                 return VLC_ENOMEM;
             }
+            ck->p_sample_count_pts = ck->p_sample_pts_info;
+            ck->p_sample_offset_pts = ck->p_sample_pts_info + ck->i_entries_pts;
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
@@ -3645,10 +3645,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
 
 static void DestroyChunk( mp4_chunk_t *ck )
 {
-    free( ck->p_sample_count_dts );
-    free( ck->p_sample_delta_dts );
-    free( ck->p_sample_count_pts );
-    free( ck->p_sample_offset_pts );
+    free( ck->p_sample_dts_info );
+    free( ck->p_sample_pts_info );
 }
 
 /****************************************************************************
