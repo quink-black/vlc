@@ -2625,16 +2625,23 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
             if ( i_ret == VLC_EGENERIC )
                 return i_ret;
 
-            /* allocate them */
-            ck->p_sample_dts_info = calloc( ck->i_entries_dts * 2, sizeof( uint32_t ) );
-            if( ck->p_sample_dts_info == NULL )
+            if( ck->i_entries_dts * 2 > ARRAY_SIZE(ck->i_sample_dts_info) )
             {
-                msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_dts );
-                ck->i_entries_dts = 0;
-                return VLC_ENOMEM;
+                /* allocate them */
+                ck->p_sample_dts_info = calloc( ck->i_entries_dts * 2, sizeof( uint32_t ) );
+                if( ck->p_sample_dts_info == NULL )
+                {
+                    msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_dts );
+                    ck->i_entries_dts = 0;
+                    return VLC_ENOMEM;
+                }
+                ck->p_sample_count_dts = ck->p_sample_dts_info;
             }
-            ck->p_sample_count_dts = ck->p_sample_dts_info;
-            ck->p_sample_delta_dts = ck->p_sample_dts_info + ck->i_entries_dts;
+            else
+            {
+                ck->p_sample_count_dts = ck->i_sample_dts_info;
+            }
+            ck->p_sample_delta_dts = ck->p_sample_count_dts + ck->i_entries_dts;
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
@@ -2739,16 +2746,23 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
             if ( i_ret == VLC_EGENERIC )
                 return i_ret;
 
-            /* allocate them */
-            ck->p_sample_pts_info = calloc( ck->i_entries_pts * 2, sizeof( uint32_t ) );
-            if( ck->p_sample_pts_info == NULL )
+            if( ck->i_entries_pts * 2 > ARRAY_SIZE(ck->i_sample_pts_info) )
             {
-                msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_pts );
-                ck->i_entries_pts = 0;
-                return VLC_ENOMEM;
+                /* allocate them */
+                ck->p_sample_pts_info = calloc( ck->i_entries_pts * 2, sizeof( uint32_t ) );
+                if( ck->p_sample_pts_info == NULL )
+                {
+                    msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_pts );
+                    ck->i_entries_pts = 0;
+                    return VLC_ENOMEM;
+                }
+                ck->p_sample_count_pts = ck->p_sample_pts_info;
             }
-            ck->p_sample_count_pts = ck->p_sample_pts_info;
-            ck->p_sample_offset_pts = ck->p_sample_pts_info + ck->i_entries_pts;
+            else
+            {
+                ck->p_sample_count_pts = ck->i_sample_pts_info;
+            }
+            ck->p_sample_offset_pts = ck->p_sample_count_pts + ck->i_entries_pts;
 
             /* now copy */
             i_sample_count = ck->i_sample_count;

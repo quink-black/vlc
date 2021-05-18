@@ -59,6 +59,9 @@ typedef struct
     /* TODO if needed add pts
         but quickly *add* support for edts and seeking */
 
+    /* small size optimization for p_sample_dts_info and p_sample_pts_info */
+    uint32_t     i_sample_dts_info[2];
+    uint32_t     i_sample_pts_info[2];
 } mp4_chunk_t;
 
 typedef struct
